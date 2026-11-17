@@ -1,0 +1,11 @@
+flowchart LR
+  C[Client / curl / browser] -->|api.lokal| I[Ingress NGINX]
+  C -->|auth.lokal: login| I
+  I -->|auth.lokal| K[Keycloak :8080]
+  I -->|api.lokal| A[API FastAPI x2 :8000]
+  A -.->|JWKS validasi JWT| K
+  A -->|WRITE: postgres-primary| P[(postgres-0 Primary)]
+  A -->|READ: postgres-replica| R[(postgres-1 Replica)]
+  P ==>|streaming replication| R
+  P --- V0[(PVC data-postgres-0)]
+  R --- V1[(PVC data-postgres-1)]

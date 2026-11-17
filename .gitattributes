@@ -1,0 +1,8 @@
+# Paksa LF supaya script .sh tidak rusak (CRLF) saat di-clone di Windows
+*.sh text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.sql text eol=lf
+Dockerfile text eol=lf
+*.pkl binary

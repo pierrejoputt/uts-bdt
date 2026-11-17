@@ -1,0 +1,57 @@
+services:
+  db-primary:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: appdb
+      REPL_PASSWORD: ${REPL_PASSWORD}
+    volumes:
+      - pgprimary:/var/lib/postgresql/data
+      - ./db/primary-init.sh:/docker-entrypoint-initdb.d/00-repl.sh:ro
+      - ./sql/001_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    command: ["postgres", "-c", "wal_level=replica", "-c", "max_wal_senders=5", "-c", "hot_standby=on"]
+    healthcheck:
+      # -h 127.0.0.1 -> cek lewat TCP, jadi baru "sehat" setelah server final jalan (bukan server init sementara)
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d appdb"]
+      interval: 5s
+      retries: 20
+
+  db-replica:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      REPL_PASSWORD: ${REPL_PASSWORD}
+    volumes:
+      - pgreplica:/var/lib/postgresql/data
+      - ./db/replica-entry.sh:/replica-entry.sh:ro
+    entrypoint: ["bash", "/replica-entry.sh"]
+    depends_on:
+      db-primary:
+        condition: service_healthy
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_PASSWORD}
+    volumes:
+      - ./keycloak/uts-realm.json:/opt/keycloak/data/import/uts-realm.json:ro
+    ports: ["${KC_PORT:-8080}:8080"]
+
+  api:
+    build: ./api
+    environment:
+      DB_PRIMARY_HOST: db-primary
+      DB_REPLICA_HOST: db-replica
+      DB_NAME: appdb
+      DB_USER: postgres
+      DB_PASSWORD: ${PG_PASSWORD}
+      OIDC_ISSUER: http://localhost:${KC_PORT:-8080}/realms/uts
+      JWKS_URL: http://keycloak:8080/realms/uts/protocol/openid-connect/certs
+    ports: ["${API_PORT:-8000}:8000"]
+    depends_on: [db-primary, db-replica, keycloak]
+
+volumes:
+  pgprimary: {}
+  pgreplica: {}

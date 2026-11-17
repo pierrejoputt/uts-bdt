@@ -1,0 +1,33 @@
+{
+  "realm": "uts",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "accessTokenLifespan": 120,
+  "clients": [
+    {
+      "clientId": "uts-client",
+      "name": "uts-client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["*"],
+      "webOrigins": ["*"]
+    }
+  ],
+  "users": [
+    {
+      "username": "user1",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "User",
+      "lastName": "Satu",
+      "email": "user1@uts.local",
+      "credentials": [
+        { "type": "password", "value": "user1pass", "temporary": false }
+      ]
+    }
+  ]
+}

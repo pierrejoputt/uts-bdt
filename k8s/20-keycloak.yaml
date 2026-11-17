@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: keycloak }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: keycloak } }
+  template:
+    metadata: { labels: { app: keycloak } }
+    spec:
+      containers:
+      - name: keycloak
+        image: quay.io/keycloak/keycloak:26.0
+        args: ["start-dev", "--import-realm"]
+        env:
+        - { name: KC_BOOTSTRAP_ADMIN_USERNAME, value: admin }
+        - { name: KC_BOOTSTRAP_ADMIN_PASSWORD, value: admin }
+        # Issuer di token harus sama dengan OIDC_ISSUER di app-config
+        - { name: KC_HOSTNAME, value: "http://auth.lokal" }
+        - { name: KC_HTTP_ENABLED, value: "true" }
+        - { name: KC_PROXY_HEADERS, value: xforwarded }
+        ports: [{ containerPort: 8080 }]
+        readinessProbe:
+          tcpSocket: { port: 8080 }
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 18
+        resources:
+          requests: { memory: "512Mi" }
+          limits: { memory: "1Gi" }
+        volumeMounts:
+        - { name: realm, mountPath: /opt/keycloak/data/import }
+      volumes:
+      - name: realm
+        configMap: { name: keycloak-realm }   # dibuat oleh scripts/k8s-up.sh dari keycloak/uts-realm.json
+---
+apiVersion: v1
+kind: Service
+metadata: { name: keycloak }
+spec:
+  selector: { app: keycloak }
+  ports: [{ port: 8080, targetPort: 8080 }]
