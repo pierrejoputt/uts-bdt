@@ -1,30 +1,30 @@
-=== Waktu: Tue Nov 17 23:35:44 SEAST 2026 | INGRESS_IP=127.0.0.1 ===
+=== Waktu: Thu, Nov 19, 2026 12:04:13 AM | INGRESS_IP=127.0.0.1 ===
 NAME                            READY   STATUS    RESTARTS      AGE
-pod/api-6bc99b5557-6vss8        1/1     Running   2 (59m ago)   12h
-pod/api-6bc99b5557-ntplf        1/1     Running   2 (59m ago)   12h
-pod/keycloak-6dcd74dcc6-cfsn2   1/1     Running   2 (59m ago)   12h
-pod/postgres-0                  1/1     Running   2 (59m ago)   12h
-pod/postgres-1                  1/1     Running   2 (59m ago)   12h
+pod/api-6bc99b5557-6vss8        1/1     Running   3 (21h ago)   36h
+pod/api-6bc99b5557-ntplf        1/1     Running   3 (21h ago)   36h
+pod/keycloak-6dcd74dcc6-cfsn2   1/1     Running   3 (21h ago)   37h
+pod/postgres-0                  1/1     Running   0             10m
+pod/postgres-1                  1/1     Running   0             38s
 
 NAME                                    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
-persistentvolumeclaim/data-postgres-0   Bound    pvc-a324a2a6-0e7c-4448-bd4e-53feb5416cde   1Gi        RWO            standard       <unset>                 12h
-persistentvolumeclaim/data-postgres-1   Bound    pvc-3764837a-770f-41cc-84c3-c81ca1114dc0   1Gi        RWO            standard       <unset>                 12h
+persistentvolumeclaim/data-postgres-0   Bound    pvc-a324a2a6-0e7c-4448-bd4e-53feb5416cde   1Gi        RWO            standard       <unset>                 37h
+persistentvolumeclaim/data-postgres-1   Bound    pvc-3764837a-770f-41cc-84c3-c81ca1114dc0   1Gi        RWO            standard       <unset>                 37h
 
 NAME                        TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
-service/api                 ClusterIP   10.96.58.237    <none>        8000/TCP   12h
-service/keycloak            ClusterIP   10.96.204.192   <none>        8080/TCP   12h
-service/kubernetes          ClusterIP   10.96.0.1       <none>        443/TCP    19d
-service/postgres-headless   ClusterIP   None            <none>        5432/TCP   12h
-service/postgres-primary    ClusterIP   10.96.86.137    <none>        5432/TCP   12h
-service/postgres-replica    ClusterIP   10.96.159.162   <none>        5432/TCP   12h
+service/api                 ClusterIP   10.96.58.237    <none>        8000/TCP   37h
+service/keycloak            ClusterIP   10.96.204.192   <none>        8080/TCP   37h
+service/kubernetes          ClusterIP   10.96.0.1       <none>        443/TCP    20d
+service/postgres-headless   ClusterIP   None            <none>        5432/TCP   37h
+service/postgres-primary    ClusterIP   10.96.86.137    <none>        5432/TCP   37h
+service/postgres-replica    ClusterIP   10.96.159.162   <none>        5432/TCP   37h
 
 NAME                                    CLASS   HOSTS                  ADDRESS      PORTS   AGE
-ingress.networking.k8s.io/uts-ingress   nginx   auth.lokal,api.lokal   172.18.0.2   80      12h
+ingress.networking.k8s.io/uts-ingress   nginx   auth.lokal,api.lokal   172.18.0.2   80      37h
 
 ### SSO: ambil token via Keycloak (issuer http://auth.lokal/realms/uts)
 token OK (1037 karakter)
 Payload (tempel token ke jwt.io untuk screenshot; lihat iss, sub, exp):
-{"exp":1794933467,"iat":1794933347,"jti":"d10324f5-66ed-464b-8fe5-a6a5b51cf955","iss":"http://auth.lokal/realms/uts","sub":"4c4e12e9-3540-45c1-9f4b-28fb176c7f42","typ":"Bearer","azp":"uts-client","sid":"87a5163e-c7bd-410c-8130-a57f445f831e","acr":"1","allowed-origins":["*"],"scope":"profile email","email_verified":true,"name":"User Satu","preferred_username":"user1","given_name":"User","family_name":"Satu","email":"user1@uts.local"}
+{"exp":1795021576,"iat":1795021456,"jti":"c32ef878-a55d-4077-863d-ddacacae75e2","iss":"http://auth.lokal/realms/uts","sub":"d8215689-a3e8-43c2-b69d-54fc46ca554d","typ":"Bearer","azp":"uts-client","sid":"a34013da-d2d0-4ddf-abab-e284fe810d32","acr":"1","allowed-origins":["*"],"scope":"profile email","email_verified":true,"name":"User Satu","preferred_username":"user1","given_name":"User","family_name":"Satu","email":"user1@uts.local"}
 
 ### SSO: tanpa token -> 401, dengan token -> 200
 tanpa token : HTTP 401
@@ -41,22 +41,22 @@ token rusak : HTTP 401 (harus 401)
 ### Replikasi: pg_stat_replication di primary
  client_addr |   state   
 -------------+-----------
- 10.244.0.8  | streaming
+ 10.244.0.12 | streaming
 (1 row)
 
 pg_is_in_recovery di postgres-1 (harus t):
 t
 GET /history (harus served_by_replica:true):
-{"served_by_replica":true,"rows":[[3,{"features":[6.3,3.3,6.0,2.5]},2,"2026-11-17T16:35:50.242317+00:00"],[2,{"features":[6.7,3.1,4.7,1.5]},1,"2026-11-17T16:35:50.096735+00:00"],[1,{"features":[5.1,3.5,1.4,0.2]},0,"2026-11-17T16:35:49.826504+00:00"]]}
+{"served_by_replica":true,"rows":[[7,{"features":[6.3,3.3,6.0,2.5]},2,"2026-11-18T17:04:19.656602+00:00"],[6,{"features":[6.7,3.1,4.7,1.5]},1,"2026-11-18T17:04:19.490944+00:00"],[5,{"features":[5.1,3.5,1.4,0.2]},0,"2026-11-18T17:04:19.308891+00:00"]]}
 
 ### Persistensi PVC: hitung baris -> hapus postgres-0 -> hitung ulang
-Sebelum: 3 baris
+Sebelum: 7 baris
 pod "postgres-0" deleted from default namespace
 postgres-0 Running/Ready lagi
-Sesudah: 3 baris  -> SAMA/LULUS
+Sesudah: 7 baris  -> SAMA/LULUS
 NAME              STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
-data-postgres-0   Bound    pvc-a324a2a6-0e7c-4448-bd4e-53feb5416cde   1Gi        RWO            standard       <unset>                 12h
-data-postgres-1   Bound    pvc-3764837a-770f-41cc-84c3-c81ca1114dc0   1Gi        RWO            standard       <unset>                 12h
+data-postgres-0   Bound    pvc-a324a2a6-0e7c-4448-bd4e-53feb5416cde   1Gi        RWO            standard       <unset>                 37h
+data-postgres-1   Bound    pvc-3764837a-770f-41cc-84c3-c81ca1114dc0   1Gi        RWO            standard       <unset>                 37h
 
 ### Failover pod replica: hapus postgres-1
 pod "postgres-1" deleted from default namespace
@@ -66,9 +66,9 @@ HTTP 200
 HTTP 503
 postgres-1 kembali Ready
 /history setelah pulih:
-{"served_by_replica":true,"rows":[[4,{"features":[5.0,3.6,1.4,0.2]},0,"2026-11-17T16:36:06.941113+00:00"],[3,{"features":[6.3,3.3,6.0,2.5]},2,"2026-11-17T16:35:50.242317+00:00"],[2,{"features":[6.7,3.1,4.7,1.5]},1,"2026-11-17T16:35:50.096735+00:00"],[1,{"features":[5.1,3.5,1.4,0.2]},0,"2026-11-17T16:35:49.826504+00:00"]]}
+{"served_by_replica":true,"rows":[[8,{"features":[5.0,3.6,1.4,0.2]},0,"2026-11-18T17:04:36.629632+00:00"],[7,{"features":[6.3,3.3,6.0,2.5]},2,"2026-11-18T17:04:19.656602+00:00"],[6,{"features":[6.7,3.1,4.7,1.5]},1,"2026-11-18T17:04:19.490944+00:00"],[5,{"features":[5.1,3.5,1.4,0.2]},0,"2026-11-18T17:04:19.308891+00:00"]]}
 
 ### DNS discovery: API mengakses DB lewat hostname, bukan IP pod
 10.96.86.137    postgres-primary.default.svc.cluster.local
 10.96.159.162   postgres-replica.default.svc.cluster.local
-10.244.0.11     postgres-0.postgres-headless.default.svc.cluster.local
+10.244.0.13     postgres-0.postgres-headless.default.svc.cluster.local
